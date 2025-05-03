@@ -1,0 +1,39 @@
+install.packages("tm")
+install.packages("wordcloud")
+install.packages("syuzhet")
+library(tm)
+library(wordcloud)
+library(syuzhet)
+
+text<-readLines("C:/Users/Hp/Documents/text.txt")
+View(text)
+#converting into corpus
+corpus<-Corpus(VectorSource(text))
+View(corpus)
+
+#processing the corpus
+corpus<-tm_map(corpus,stripWhitespace)
+corpus<-tm_map(corpus,content_transformer(tolower))
+corpus<-tm_map(corpus,removeWords,stopwords("english"))
+corpus<-tm_map(corpus,removePunctuation)
+inspect(corpus)
+
+#converting into quantity matrix
+dtm<-DocumentTermMatrix(corpus)
+dtm<-as.matrix(dtm)
+View(dtm)
+
+#calculating frequency
+freq<-colSums(dtm)
+View(freq)
+freq<-sort(freq,decreasing=TRUE)
+View(freq)
+
+#generating wordcloud
+wordcloud(names(freq),freq=freq,min.freq = 3,col=rainbow(10),random.order = FALSE)
+
+#sentiment analysis
+library(syuzhet)
+sentiment<-get_nrc_sentiment(text)
+View(sentiment)
+barplot(colSums(sentiment),las=2,col=rainbow(10),main="SENTIMENT ANALYSISOF PREZI SPEECH")
